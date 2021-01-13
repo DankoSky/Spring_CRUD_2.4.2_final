@@ -2,6 +2,7 @@ package web.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,12 @@ public class LoginController {
 
     @GetMapping("/user/{id}")
     public String show(Model model, @PathVariable("id") long id) {
+        User currentuser = (User) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        if(currentuser.getId()!=id&&currentuser.getRoles().stream().noneMatch((x->x.getName().contains("ROLE_ADMIN")))){
+            return "redirect:/user/" + currentuser.getId();
+        }
         model.addAttribute("user", userService.show(id));
         return "user";
     }

@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import web.config.handler.LoginSuccessHandler;
 
@@ -18,20 +17,30 @@ import web.config.handler.LoginSuccessHandler;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-    @Autowired
-    private  LoginSuccessHandler loginSuccessHandler; // класс, в котором описана логика перенаправления пользователей по ролям
+     private UserDetailsService userDetailsService;
+     private LoginSuccessHandler loginSuccessHandler;
 
-
+    @Autowired
+    public void setLoginSuccessHandler(LoginSuccessHandler loginSuccessHandler) {
+      this.loginSuccessHandler = loginSuccessHandler;
+    }
+    @Autowired
+    public void setUserDetailsService   (UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+//    @Autowired
+//    public SecurityConfig(UserDetailsService userDetailsService, LoginSuccessHandler loginSuccessHandler) {
+//        this.userDetailsService = userDetailsService;
+//        this.loginSuccessHandler = loginSuccessHandler;
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                     .antMatchers("/").hasAnyRole("ADMIN","USER")
-                    .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                    .antMatchers("/user/{id}").hasAnyRole("ADMIN", "USER")
                     .antMatchers("/admin/**").hasRole("ADMIN")
-                   //                .antMatchers("/admin/**", "/hello").anonymous()
+//                                .antMatchers("/admin/**", "/hello").anonymous()
                     .and()
                 .formLogin()
                     .successHandler(loginSuccessHandler)

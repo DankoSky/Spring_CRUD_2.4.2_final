@@ -10,7 +10,7 @@ import java.util.Locale;
 
 public class RoleFormatter implements Formatter<Role> {
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
     @Autowired
     public RoleFormatter(EntityManager entityManager) {
         this.entityManager = entityManager;
